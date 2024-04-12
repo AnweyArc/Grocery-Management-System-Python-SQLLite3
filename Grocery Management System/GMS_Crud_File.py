@@ -1,7 +1,7 @@
 import sqlite3
 
 # Define the name of your SQLite database file
-database_name = "your_database_name.db"
+database_name = "grocery_database.db"
 
 # Create the database table if it does not exist
 def create_database():
@@ -18,6 +18,23 @@ def add_item(item_name, item_quantity, item_price):
     cursor.execute("INSERT INTO items (name, quantity, price) VALUES (?, ?, ?)", (item_name, item_quantity, item_price))
     connection.commit()
     connection.close()
+
+# Function to update the quantity of an existing item in the database
+def update_item_quantity(item_name, new_quantity):
+    connection = sqlite3.connect(database_name)
+    cursor = connection.cursor()
+    cursor.execute("UPDATE items SET quantity=? WHERE name=?", (new_quantity, item_name))
+    connection.commit()
+    connection.close()
+
+# Function to get an item by name from the database
+def get_item_by_name(item_name):
+    connection = sqlite3.connect(database_name)
+    cursor = connection.cursor()
+    cursor.execute("SELECT * FROM items WHERE name=?", (item_name,))
+    item = cursor.fetchone()
+    connection.close()
+    return item
 
 # Function to fetch all items from the database
 def fetch_items():
@@ -59,5 +76,13 @@ def clear_database():
     connection = sqlite3.connect(database_name)
     cursor = connection.cursor()
     cursor.execute("DELETE FROM items")
+    connection.commit()
+    connection.close()
+
+# Function to edit an item in the database
+def edit_item(item_id, new_name, new_quantity, new_price):
+    connection = sqlite3.connect(database_name)
+    cursor = connection.cursor()
+    cursor.execute("UPDATE items SET name=?, quantity=?, price=? WHERE id=?", (new_name, new_quantity, new_price, item_id))
     connection.commit()
     connection.close()
