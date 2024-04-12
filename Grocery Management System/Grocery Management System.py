@@ -141,7 +141,6 @@ def view_items():
         item_listbox.insert(tk.END, f"Item Name: {item[1]} \tQuantity: {item[2]} \tPrice: {item[3]}")  # Include item price in the display
 
 # Functionality for viewing sold items
-# Functionality for viewing sold items
 def view_sold_items():
     # Fetch sold items from the database
     sold_items = GMS_Crud_File.fetch_sold_items()
@@ -233,10 +232,6 @@ def clear_database():
     GMS_Crud_File.clear_database()
     view_items()
 
-# Functionality for viewing item inventory
-def view_item_inventory():
-    # Placeholder function for viewing item inventory
-    pass
 
 # Functionality for clearing item inventory
 def clear_item_inventory():
