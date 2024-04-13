@@ -211,6 +211,24 @@ def view_sold_items():
             item_name, quantity, price_per_item = item
             total_price = quantity * price_per_item  # Calculate total price for each sold item
             sold_items_listbox.insert(tk.END, f"Sold {quantity} quantities of {item_name} for {total_price}")
+
+        # Function to clear the listbox
+        def clear_listbox():
+            sold_items_listbox.delete(0, tk.END)
+
+        # Function to permanently clear the listbox
+        def clear_listbox_permanently():
+            sold_items_listbox.delete(0, tk.END)
+            # Remove sold items from the database
+            GMS_Crud_File.clear_sold_items()
+
+        # Create a button to clear the listbox
+        clear_button = ttk.Button(sold_items_window, text="Clear", command=clear_listbox)
+        clear_button.pack(side=tk.LEFT, padx=(0, 5))
+
+        # Create a button to permanently clear the listbox
+        clear_permanently_button = ttk.Button(sold_items_window, text="Clear Permanently", command=clear_listbox_permanently)
+        clear_permanently_button.pack(side=tk.LEFT)
     else:
         messagebox.showinfo("No Sold Items", "There are no sold items to display.")
 

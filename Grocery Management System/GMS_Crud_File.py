@@ -83,29 +83,6 @@ def delete_item(item_id):
         if connection:
             connection.close()
 
-# Function to update the quantity of sold items
-def sell_item(item_name, sold_quantity):
-    try:
-        connection = sqlite3.connect(database_name)
-        cursor = connection.cursor()
-        cursor.execute("SELECT id, quantity, price FROM items WHERE name=?", (item_name,))
-        item = cursor.fetchone()
-        if item:
-            item_id, current_quantity, price = item
-            if current_quantity >= sold_quantity:
-                new_quantity = current_quantity - sold_quantity
-                cursor.execute("UPDATE items SET quantity=? WHERE id=?", (new_quantity, item_id))
-                connection.commit()
-            else:
-                print("Error: Insufficient quantity to sell.")
-        else:
-            print("Error: Item not found in database.")
-    except sqlite3.Error as e:
-        print("Error selling item:", e)
-    finally:
-        if connection:
-            connection.close()
-
 # Function to clear the entire database
 def clear_database():
     try:
@@ -185,16 +162,15 @@ def add_sold_item(item_name, sold_quantity, price_per_item):
         if connection:
             connection.close()
 
-# Function to fetch all sold items from the database
-def fetch_sold_items():
+# Function to clear the sold items from the database
+def clear_sold_items():
     try:
         connection = sqlite3.connect(database_name)
         cursor = connection.cursor()
-        cursor.execute("SELECT name, quantity, price FROM sold_items")
-        sold_items = cursor.fetchall()
-        return sold_items
+        cursor.execute("DELETE FROM sold_items")
+        connection.commit()
     except sqlite3.Error as e:
-        print("Error fetching sold items:", e)
+        print("Error clearing sold items:", e)
     finally:
         if connection:
             connection.close()
@@ -223,4 +199,3 @@ def sell_item(item_name, sold_quantity):
     finally:
         if connection:
             connection.close()
-
