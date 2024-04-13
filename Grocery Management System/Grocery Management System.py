@@ -143,7 +143,7 @@ def view_items():
 # Functionality for viewing sold items
 def view_sold_items():
     # Fetch sold items from the database
-    sold_items = GMS_Crud_File.fetch_sold_items()
+    sold_items = GMS_Crud_File.fetch_items()
 
     if sold_items:
         # Create a new window to display sold items
