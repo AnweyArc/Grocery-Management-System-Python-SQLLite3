@@ -96,3 +96,14 @@ def clear_inventory():
     cursor.execute("UPDATE items SET quantity=0")  # Set quantity of all items to 0
     connection.commit()
     connection.close()
+    
+# Function to fetch all sold items from the database
+
+def fetch_sold_items():
+    connection = sqlite3.connect(database_name)
+    cursor = connection.cursor()
+    cursor.execute("SELECT name, quantity, price FROM sold_items")  # Fetch name, quantity, and price from sold_items table
+    sold_items = cursor.fetchall()
+    connection.close()
+    return sold_items
+

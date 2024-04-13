@@ -72,6 +72,9 @@ def add_items():
     add_existing_item_button.grid(row=2, column=0, columnspan=2, pady=10)
 
 
+# Add a global variable to store the sold items for receipt
+sold_items_for_receipt = []
+
 # Functionality for selling items
 def sell_items():
     if not GMS_Crud_File.fetch_items():
@@ -85,12 +88,31 @@ def sell_items():
                 GMS_Crud_File.sell_item(item_name, sold_quantity)  # Assuming a function to update the quantity sold
                 
                 # Record the sold item in the sold items listbox
-                sold_items_listbox.insert(tk.END, f"Sold {sold_quantity} Pieces of {item_name}")
+                sold_items_for_receipt.append(f"Sold {sold_quantity} Pieces of {item_name}")
                 
-                sell_window.destroy()
-                view_items()  # Refresh the view
+                # Clear sold quantity entry
+                sold_quantity_entry.delete(0, tk.END)
+                
+                # Update receipt listbox
+                update_receipt_listbox()
+                
+                status_label.config(text="Item sold successfully.", foreground="green")
             else:
                 status_label.config(text="Please select an item to sell.", foreground="red")
+        
+        def update_receipt_listbox():
+            # Clear receipt listbox
+            receipt_listbox.delete(0, tk.END)
+            # Add sold items to receipt listbox
+            for item in sold_items_for_receipt:
+                receipt_listbox.insert(tk.END, item)
+        
+        def finish_selling():
+            sell_window.destroy()
+            # Clear the sold items list for receipt
+            sold_items_for_receipt.clear()
+            # Update receipt listbox
+            update_receipt_listbox()
 
         sell_window = tk.Toplevel(root)
         sell_window.title("Sell Item")
@@ -112,12 +134,15 @@ def sell_items():
         sell_button = ttk.Button(sell_window, text="Sell", command=sell_from_database)
         sell_button.grid(row=2, column=0, columnspan=2, pady=10)
 
-        status_label = ttk.Label(sell_window, text="", foreground="black")
-        status_label.grid(row=3, column=0, columnspan=2)
+        finish_button = ttk.Button(sell_window, text="Finish", command=finish_selling)
+        finish_button.grid(row=3, column=0, columnspan=2, pady=10)
 
-        # Create a listbox to display sold items
-        sold_items_listbox = tk.Listbox(sell_window, height=10, width=40)
-        sold_items_listbox.grid(row=4, column=0, columnspan=2, padx=10, pady=5)
+        status_label = ttk.Label(sell_window, text="", foreground="black")
+        status_label.grid(row=4, column=0, columnspan=2)
+
+        # Create a listbox to display sold items for receipt
+        receipt_listbox = tk.Listbox(sell_window, height=10, width=40)
+        receipt_listbox.grid(row=5, column=0, columnspan=2, padx=10, pady=5)
 
 def view_item_inventory():
     if not GMS_Crud_File.fetch_items():
@@ -143,7 +168,7 @@ def view_items():
 # Functionality for viewing sold items
 def view_sold_items():
     # Fetch sold items from the database
-    sold_items = GMS_Crud_File.fetch_items()
+    sold_items = GMS_Crud_File.fetch_sold_items()
 
     if sold_items:
         # Create a new window to display sold items
@@ -156,9 +181,12 @@ def view_sold_items():
 
         # Display sold items in the listbox
         for item in sold_items:
-            sold_items_listbox.insert(tk.END, item)
+            item_name, quantity, price_per_item = item
+            total_price = quantity * price_per_item  # Calculate total price for each sold item
+            sold_items_listbox.insert(tk.END, f"Sold {quantity} quantities of {item_name} for {total_price}")
     else:
         messagebox.showinfo("No Sold Items", "There are no sold items to display.")
+
 
 # Functionality for editing an item
 def edit_item():
