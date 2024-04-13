@@ -80,23 +80,45 @@ def sell_items():
     if not GMS_Crud_File.fetch_items():
         messagebox.showinfo("No Items", "There are no items in the inventory!")
     else:
+        # Define receipt_listbox as a global variable
+        global receipt_listbox
+
         def sell_from_database():
-            selected_item = item_listbox.get(tk.ACTIVE)  # Get the selected item from the listbox
+            selected_item = item_listbox.curselection()  # Get the index of the selected item
             if selected_item:
-                item_name = selected_item
+                index = selected_item[0]  # Extract the index from the tuple
+                item_name = item_listbox.get(index)  # Get the selected item from the listbox
+                item_name = item_name.split('(')[0].strip()  # Extract item name from the selected item string
                 sold_quantity = int(sold_quantity_entry.get())  # Get the quantity sold
-                GMS_Crud_File.sell_item(item_name, sold_quantity)  # Assuming a function to update the quantity sold
-                
-                # Record the sold item in the sold items listbox
-                sold_items_for_receipt.append(f"Sold {sold_quantity} Pieces of {item_name}")
-                
-                # Clear sold quantity entry
-                sold_quantity_entry.delete(0, tk.END)
-                
-                # Update receipt listbox
-                update_receipt_listbox()
-                
-                status_label.config(text="Item sold successfully.", foreground="green")
+                item = GMS_Crud_File.get_item_by_name(item_name)
+                if item:
+                    current_quantity = item[2]
+                    if sold_quantity <= current_quantity:
+                        GMS_Crud_File.sell_item(item_name, sold_quantity)  # Assuming a function to update the quantity sold
+
+                        # Record the sold item in the sold items listbox
+                        sold_items_for_receipt.append(f"Sold {sold_quantity} Pieces of {item_name}")
+
+                        # Update remaining quantity for the item
+                        remaining_quantity = current_quantity - sold_quantity
+                        if remaining_quantity > 0:
+                            item_listbox.delete(index)
+                            item_listbox.insert(index, f"{item_name} (Qty: {remaining_quantity})")
+                        else:
+                            item_listbox.delete(index)
+                            view_items()
+
+                        # Clear sold quantity entry
+                        sold_quantity_entry.delete(0, tk.END)
+
+                        # Update receipt listbox
+                        update_receipt_listbox()
+
+                        status_label.config(text="Item sold successfully.", foreground="green")
+                    else:
+                        status_label.config(text=f"Not enough {item_name} in inventory.", foreground="red")
+                else:
+                    status_label.config(text="Item not found in inventory.", foreground="red")
             else:
                 status_label.config(text="Please select an item to sell.", foreground="red")
         
@@ -124,7 +146,7 @@ def sell_items():
         item_listbox.grid(row=0, column=1, padx=10, pady=5)
         items = GMS_Crud_File.fetch_items()
         for item in items:
-            item_listbox.insert(tk.END, f"{item[1]}")
+            item_listbox.insert(tk.END, f"{item[1]} (Qty: {item[2]})")  # Include quantity in the display
 
         sold_quantity_label = ttk.Label(sell_window, text="Quantity Sold:")
         sold_quantity_label.grid(row=1, column=0, padx=10, pady=5, sticky="e")
@@ -138,12 +160,16 @@ def sell_items():
         finish_button.grid(row=3, column=0, columnspan=2, pady=10)
 
         status_label = ttk.Label(sell_window, text="", foreground="black")
-        status_label.grid(row=4, column=0, columnspan=2)
+        status_label.grid(row=4, column=0, columnspan=2, pady=(0, 10))
 
         # Create a listbox to display sold items for receipt
         receipt_listbox = tk.Listbox(sell_window, height=10, width=40)
         receipt_listbox.grid(row=5, column=0, columnspan=2, padx=10, pady=5)
 
+
+
+
+# Functionality for Viewing Items in inventory
 def view_item_inventory():
     if not GMS_Crud_File.fetch_items():
         messagebox.showinfo("No Items", "There are no items in the inventory!")
@@ -171,6 +197,7 @@ def view_sold_items():
     sold_items = GMS_Crud_File.fetch_sold_items()
 
     if sold_items:
+        print("Sold Items:", sold_items)  # Debugging statement
         # Create a new window to display sold items
         sold_items_window = tk.Toplevel(root)
         sold_items_window.title("Sold Items")
@@ -186,6 +213,8 @@ def view_sold_items():
             sold_items_listbox.insert(tk.END, f"Sold {quantity} quantities of {item_name} for {total_price}")
     else:
         messagebox.showinfo("No Sold Items", "There are no sold items to display.")
+
+
 
 
 # Functionality for editing an item
