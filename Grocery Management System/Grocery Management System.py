@@ -309,10 +309,10 @@ root.title("Grocery Management System")
 root.geometry("800x600")
 
 # Add background color
-root.configure(bg="#008080")  # Updated background color
+root.configure(bg="#cabeaf")  # Updated background color
 
 # Create header label
-header_label = ttk.Label(root, text="Arcenas' Grocery", font=("Helvetica", 20), background="#008080", foreground="white")
+header_label = ttk.Label(root, text="Arcenas' Grocery", font=("Helvetica", 20), background="#cabeaf", foreground="black")
 header_label.grid(row=0, column=0, columnspan=2, pady=20)
 
 # Create frame for buttons and listbox
@@ -321,11 +321,11 @@ frame_buttons.grid(row=1, column=0, sticky="ns")
 
 # Configure style for the frame
 style = ttk.Style()
-style.configure("TFrame", background="#008080")
+style.configure("TFrame", background="#cabeaf")
 
 # Create buttons with some styling
 button_style = ttk.Style()
-button_style.configure('TButton', font=('Helvetica', 14), foreground="#4169e1", background="#4169e1", padding=10)
+button_style.configure('TButton', font=('Helvetica', 14), foreground="#b5485d", background="#b5485d", padding=10)
 
 # Initialize database
 GMS_Crud_File.create_database()
